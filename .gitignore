@@ -1,0 +1,25 @@
+# ---- Python / FastAPI ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+*.db
+*.sqlite3
+.env
+
+# ---- Node / Next.js ----
+node_modules/
+.next/
+out/
+.env.local
+.env*.local
+npm-debug.log*
+yarn-error.log*
+
+# ---- Editor / OS ----
+.DS_Store
+.vscode/
+.idea/
+*.log
