@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./zoom_clone.db"
 
     # CORS — comma-separated list of allowed frontend origins
-    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000,https://zoom-clone-teal-five.vercel.app"
 
     class Config:
         env_file = ".env"
