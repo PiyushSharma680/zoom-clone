@@ -1,203 +1,465 @@
-# Zoom Clone — Video Conferencing Platform
+<div align="center">
 
-A full-stack, production-style clone of the Zoom web app. Create instant
-meetings, schedule future ones, join by ID or invite link, and run real
-video meetings with WebRTC — camera/mic, screen share, in-meeting chat,
-participants panel, and host controls (mute all / remove participant).
+<img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js&logoColor=white" />
+<img src="https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+<img src="https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/TailwindCSS-3.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" />
+<img src="https://img.shields.io/badge/SQLite-3-003B57?style=for-the-badge&logo=sqlite&logoColor=white" />
+<img src="https://img.shields.io/badge/WebRTC-Realtime-333333?style=for-the-badge&logo=webrtc&logoColor=white" />
+<img src="https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel&logoColor=white" />
+<img src="https://img.shields.io/badge/Render-Backend-46E3B7?style=for-the-badge&logo=render&logoColor=black" />
+<img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
 
-Built for the SDE Fullstack assignment. UI, UX, and workflows are modelled
-closely on Zoom's web client.
+# 🎥 Zoom Clone
+
+### A Full-Stack, Production-Deployed Video Conferencing Platform
+
+Real-time video calls, live signaling, and meeting management — built with **Next.js**, **FastAPI**, **WebRTC** and **WebSockets**.
+
+**[🚀 Live App](https://zoom-clone-teal-five.vercel.app)** &nbsp;·&nbsp; **[⚙️ Backend API](https://zoom-clone-0e5k.onrender.com)** &nbsp;·&nbsp; **[📘 API Docs](https://zoom-clone-0e5k.onrender.com/docs)**
+
+</div>
+
+<br/>
+
+<div align="center">
+
+<img src="./screenshots/hero.png" alt="Zoom Clone Hero"/>
+
+</div>
+
+<br/>
+
+## 📑 Table of Contents
+
+- [About the Project](#about-the-project)
+- [Key Features](#key-features)
+- [System Architecture](#system-architecture)
+- [Tech Stack](#tech-stack)
+- [Screenshots](#screenshots)
+- [Project Structure](#project-structure)
+- [API Reference](#api-reference)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Security](#security)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Author](#author)
+- [License](#license)
+
+<br/>
+
+<a name="about-the-project"></a>
+
+## 📖 About the Project
+
+**Zoom Clone** is a full-stack video conferencing platform that recreates the core experience of tools like Zoom and Google Meet, built entirely from scratch and deployed end-to-end. It covers the full slice of a real-time product: a secure REST API for accounts and meetings, a WebSocket layer for live signaling, and peer-to-peer audio/video streaming over WebRTC — all wrapped in a responsive Next.js interface.
+
+The goal behind this project was to go deep on real-time web architecture: how independent pieces — authentication, persistence, signaling, and peer connections — come together into one coherent, production-deployed application rather than a local-only demo.
+
+**What you can do in the app:**
+
+- Create an account and sign in securely
+- Start an instant meeting, or schedule one for later
+- Join a meeting by ID or shareable invite link
+- Talk face-to-face over a live WebRTC video/audio connection
+- Track upcoming meetings and past meeting history from a central dashboard
+
+<br/>
+
+<a name="key-features"></a>
+
+## ✨ Key Features
+
+### 🔐 Authentication & Account Security
+
+- Email/password signup with server-side validation
+- Login issues a short-lived **JWT access token**, used to authorize every subsequent request
+- Passwords are hashed with **BCrypt** — plaintext passwords are never stored
+- Protected routes on both ends: the frontend redirects unauthenticated users, and the backend guards routes with dependency-injected auth checks
+- `GET /api/auth/me` returns the current session's profile, so the UI always knows who's logged in
+
+### 🎥 Instant & Scheduled Meetings
+
+- Start a meeting instantly — the backend generates a unique meeting ID and the host is dropped straight into the room
+- Or schedule a meeting for later with a title, date, and time; it surfaces under "Upcoming Meetings" on the dashboard until it's time to join
+
+### 🔗 Join via Meeting ID or Invite Link
+
+- Anyone with the meeting ID or a shared invite link can join directly — no separate onboarding flow needed beyond a normal login
+
+### 📹 Real-Time Video & Audio (WebRTC)
+
+- Camera and microphone access is requested and managed directly in the call UI
+- Audio/video streams flow **peer-to-peer** between participants' browsers once the connection is negotiated, keeping latency low and taking load off the server
+
+### 🔌 Live Signaling (WebSockets)
+
+- A persistent WebSocket connection is what makes the video calls possible in the first place — it carries the offer/answer/ICE-candidate exchange that WebRTC needs to establish a peer connection
+- The same channel powers presence, so participants can see who's joined or left the room in real time
+
+### 🖥️ Dashboard & Meeting History
+
+- A central dashboard summarizing recent meetings, upcoming scheduled ones, and quick actions (New Meeting / Join / Schedule)
+- A full meeting history log to look back on past sessions
+
+Screenshots are included below for the full end-to-end flow.
+
+### 📱 Responsive, Zoom-Inspired UI
+
+- Built with Tailwind CSS to adapt cleanly across desktop, tablet, and mobile
+- UI patterns modeled after conferencing tools people already know, keeping the learning curve near zero
+
+<br/>
+
+<a name="system-architecture"></a>
+
+## 🏗️ System Architecture
+
+```mermaid
+flowchart LR
+    A[Next.js Frontend] -->|REST API| B[FastAPI Backend]
+    B --> D[(SQLite Database)]
+    A <-->|WebSocket Signaling| C[Signaling Layer]
+    C --> B
+    A <-.->|WebRTC P2P Media| P[Peer Browser]
+```
+
+- **REST layer:** the Next.js frontend calls FastAPI endpoints for everything that isn't real-time — signup, login, creating/scheduling/listing meetings
+- **Signaling layer:** a WebSocket connection between each client and the backend exchanges the SDP offers/answers and ICE candidates needed to set up a WebRTC session
+- **Media layer:** once signaling completes, video/audio flows **directly between browsers** over WebRTC — the server is never in the media path
+- **Persistence:** SQLite stores users and meeting records via SQLAlchemy models
+
+<br/>
+
+<a name="tech-stack"></a>
+
+## 🛠️ Tech Stack
+
+| Layer                | Technology                    | Purpose                                   |
+| -------------------- | ----------------------------- | ----------------------------------------- |
+| **Frontend**         | Next.js 14, React, TypeScript | UI framework & routing                    |
+| **Styling**          | Tailwind CSS                  | Responsive, utility-first styling         |
+| **Backend**          | FastAPI, Python 3.13          | REST API & WebSocket server               |
+| **ORM / Validation** | SQLAlchemy, Pydantic          | Data models & request/response validation |
+| **Database**         | SQLite                        | Persistent storage for users & meetings   |
+| **Auth**             | JWT, BCrypt                   | Stateless auth & password hashing         |
+| **Real-Time**        | WebRTC, WebSockets            | Peer-to-peer media & live signaling       |
+| **Frontend Hosting** | Vercel                        | CI/CD + edge hosting for Next.js          |
+| **Backend Hosting**  | Render                        | API & WebSocket server hosting            |
+
+<br/>
+<a name="screenshots"></a>
+
+# 📸 Application Screenshots
+
+The following screenshots showcase the complete workflow of the application—from authentication to scheduling meetings and joining live video conferences.
 
 ---
 
-## Tech Stack
+## 🏠 Application Overview
 
-| Layer     | Technology                                                      |
-| --------- | --------------------------------------------------------------- |
-| Frontend  | Next.js 14 (App Router, TypeScript), Tailwind CSS, lucide-react |
-| Real-time | Native WebRTC (mesh) + WebSocket signaling                      |
-| Backend   | Python, FastAPI, WebSockets, SQLAlchemy 2.0                     |
-| Database  | SQLite                                                          |
-| Auth      | JWT (python-jose) + bcrypt (passlib)                            |
+<p align="center">
+<img src="./screenshots/hero.png" alt="Zoom Clone Hero"/>
+</p>
 
----
-
-## Features
-
-**Core**
-
-- **Landing dashboard** — Zoom-style home with navbar, profile/settings menu,
-  New / Join / Schedule / Share tiles, live clock & greeting, **Upcoming** and
-  **Recent** meeting sections.
-- **Instant meeting** — one click creates a meeting with a unique 11-digit
-  Meeting ID + shareable invite link, then drops you into the room.
-- **Join meeting** — by Meeting ID _or_ pasted invite link, with server-side
-  validation and a display-name / device-check lobby.
-- **Schedule meeting** — title, description, date & time, duration; auto-generated
-  link; stored in the DB and surfaced under Upcoming.
-
-**Bonus (all implemented)**
-
-- **Responsive design** — mobile, tablet, desktop.
-- **Authentication** — login / signup with JWT; a default seeded account.
-- **Host controls** — mute all, remove participant.
-
-**Meeting room extras**
-
-- Real camera/mic via `getUserMedia`, mesh WebRTC peer connections.
-- Gallery grid that adapts to participant count, mirrored self-view.
-- Screen sharing, mic/cam toggles with live broadcast of state.
-- In-meeting chat (persisted to SQLite), participants panel, meeting timer,
-  copy-invite, connection status.
+<p align="center">
+A modern, responsive dashboard providing instant access to meeting creation, scheduling, recent meetings, and productivity features.
+</p>
 
 ---
 
-## Project Structure
+## 🔐 Login Page
+
+<p align="center">
+<img src="./screenshots/login.png" alt="Login Page" width="900"/>
+</p>
+
+<p align="center">
+Secure authentication using JWT-based login. Users can quickly access their personalized dashboard after successful authentication.
+</p>
+
+---
+
+## 📝 Sign Up Page
+
+<p align="center">
+<img src="./screenshots/signup.png" alt="Signup Page" width="900"/>
+</p>
+
+<p align="center">
+Create a new account securely. Passwords are hashed before storage, ensuring user credentials remain protected.
+</p>
+
+---
+
+## 📊 Dashboard
+
+<p align="center">
+<img src="./screenshots/dashboard.png" alt="Dashboard" width="900"/>
+</p>
+
+<p align="center">
+The central dashboard provides quick access to instant meetings, scheduled meetings, meeting history, and meeting management tools through a clean and responsive interface.
+</p>
+
+---
+
+## 🎥 Create Instant Meeting
+
+<p align="center">
+<img src="./screenshots/create-meeting.png" alt="Create Meeting" width="900"/>
+</p>
+
+<p align="center">
+Launch an instant video conference with a single click. Every meeting is assigned a unique meeting ID and invitation link for secure participant access.
+</p>
+
+---
+
+## 📅 Schedule a Meeting
+
+<p align="center">
+<img src="./screenshots/schedule-meeting.png" alt="Schedule Meeting" width="900"/>
+</p>
+
+<p align="center">
+Plan meetings in advance by specifying the title, description, date, and time. Scheduled meetings are automatically organized for future access.
+</p>
+
+---
+
+## 📆 Scheduled Meetings
+
+<p align="center">
+<img src="./screenshots/scheduled-meetings.png" alt="Scheduled Meetings" width="900"/>
+</p>
+
+<p align="center">
+View all upcoming scheduled meetings directly from the dashboard, making it easy to manage and join future sessions.
+</p>
+
+---
+
+## 🎬 Live Meeting Room
+
+<p align="center">
+<img src="./screenshots/meeting-room.png" alt="Meeting Room" width="900"/>
+</p>
+
+<p align="center">
+Real-time meeting interface powered by WebRTC and WebSockets, supporting secure peer-to-peer video communication with live signaling.
+</p>
+
+---
+
+## 📚 Meeting History
+
+<p align="center">
+<img src="./screenshots/meeting-history.png" alt="Meeting History" width="900"/>
+</p>
+
+<p align="center">
+Access previously hosted meetings with complete meeting records, enabling users to review and manage past conferencing sessions.
+</p>
+
+---
+
+## 🌟 Why This Project?
+
+This project demonstrates the development of a production-ready full-stack video conferencing platform inspired by Zoom. It showcases modern web development practices including scalable backend architecture, secure authentication, real-time communication, responsive frontend design, RESTful APIs, and cloud deployment.
+
+### Key Engineering Highlights
+
+- 🔐 JWT Authentication & Authorization
+- 🎥 Real-time Video Conferencing using WebRTC
+- 🔄 WebSocket-based Signaling Server
+- 📅 Meeting Scheduling System
+- 👥 Instant Meeting Creation & Invitation Sharing
+- 📱 Fully Responsive UI
+- ⚡ FastAPI REST Backend
+- 🌐 Production Deployment on Vercel & Render
+- 🛡️ Secure Password Hashing using BCrypt
+- 🗂️ Modular and Scalable Project Structure
+
+<br/>
+
+<a name="project-structure"></a>
+
+## 📂 Project Structure
 
 ```
 zoom-clone/
-├── backend/                 # FastAPI + SQLite
+├── frontend/
+│   ├── src/
+│   │   ├── app/            # Next.js App Router pages
+│   │   ├── components/     # Reusable UI components and meeting UI
+│   │   ├── lib/            # API client, auth context, meeting hooks
+│   │   └── types/          # Shared TypeScript types
+│   ├── package.json
+│   └── .env.local.example
+│
+├── backend/
 │   ├── app/
-│   │   ├── main.py          # app entry, CORS, router wiring
-│   │   ├── config.py        # env-based settings
-│   │   ├── database.py      # engine + session
-│   │   ├── models.py        # SQLAlchemy schema
-│   │   ├── schemas.py       # Pydantic request/response models
-│   │   ├── auth.py          # JWT + password hashing
-│   │   ├── utils.py         # meeting-code + serialisation helpers
-│   │   ├── ws_manager.py    # in-memory room/peer connection manager
-│   │   ├── seed.py          # sample data seeder
-│   │   └── routers/
-│   │       ├── auth.py       # /api/auth/*
-│   │       ├── meetings.py   # /api/meetings/*
-│   │       └── signaling.py  # /ws/{code} WebSocket
+│   │   ├── routers/        # FastAPI route handlers (auth, meetings, signaling)
+│   │   ├── main.py         # FastAPI app entrypoint + CORS middleware
+│   │   ├── config.py       # Environment-backed settings
+│   │   ├── database.py     # SQLAlchemy engine and session
+│   │   ├── models.py       # SQLAlchemy models
+│   │   ├── schemas.py      # Pydantic request/response schemas
+│   │   ├── auth.py         # JWT and password utilities
+│   │   └── ws_manager.py   # In-memory WebSocket room manager
 │   ├── requirements.txt
-│   └── run.sh
-└── frontend/                # Next.js (App Router)
-    └── src/
-        ├── app/             # routes: /, /login, /signup, /join, /meeting/[id]
-        ├── components/      # Navbar, modals, meeting room UI
-        ├── lib/             # api client, auth context, useMeeting (WebRTC)
-        └── types/
+│   └── .env.example
+│
+└── README.md
 ```
 
-See **[ARCHITECTURE.md](./ARCHITECTURE.md)** for full architecture, data-flow,
-and workflow diagrams.
+<br/>
 
----
+<a name="api-reference"></a>
 
-## Getting Started
+## 🔌 API Reference
+
+> Full interactive documentation (Swagger UI) is auto-generated by FastAPI at **[`/docs`](https://zoom-clone-0e5k.onrender.com/docs)**.
+
+| Method | Endpoint                          | Description                                    | Auth Required |
+| ------ | --------------------------------- | ---------------------------------------------- | ------------- |
+| `POST` | `/api/auth/signup`                | Register a new user                            | ❌            |
+| `POST` | `/api/auth/login`                 | Authenticate & receive a JWT                   | ❌            |
+| `GET`  | `/api/auth/me`                    | Get the current user's profile                 | ✅            |
+| `POST` | `/api/meetings`                   | Create an instant meeting                      | ✅            |
+| `POST` | `/api/meetings/schedule`          | Schedule a meeting                             | ✅            |
+| `GET`  | `/api/meetings/upcoming`          | List upcoming scheduled meetings               | ✅            |
+| `GET`  | `/api/meetings/recent`            | List recent meetings                           | ✅            |
+| `GET`  | `/api/meetings/all`               | List all meetings                              | ✅            |
+| `GET`  | `/api/meetings/validate?code=...` | Validate meeting code                          | ❌            |
+| `GET`  | `/api/meetings/{code}`            | Get a meeting by code                          | ❌            |
+| `WS`   | `/ws/{code}`                      | WebSocket signaling channel for a meeting room | ❌            |
+
+<br/>
+
+<a name="getting-started"></a>
+
+## ⚙️ Getting Started
 
 ### Prerequisites
 
-- Python 3.10+
 - Node.js 18+
-- A modern browser (Chrome/Edge/Firefox) — camera/mic permission needed.
+- Python 3.10+
+- npm or yarn
 
-### 1. Backend
+### Backend Setup
 
 ```bash
 cd backend
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+python -m venv venv
+source venv/bin/activate   # venv\Scripts\activate on Windows
 pip install -r requirements.txt
-python -m app.seed          # creates zoom_clone.db + sample data
+python -m app.seed
 uvicorn app.main:app --reload --port 8000
 ```
 
-API runs at `http://localhost:8000` · interactive docs at `http://localhost:8000/docs`.
+The API runs at `http://localhost:8000`, with interactive docs at `http://localhost:8000/docs`.
 
-> Shortcut: `bash run.sh` does all of the above.
-
-### 2. Frontend
+### Frontend Setup
 
 ```bash
 cd frontend
-cp .env.local.example .env.local
 npm install
 npm run dev
 ```
 
-App runs at `http://localhost:3000`.
+The app runs at `http://localhost:3000`.
 
-### Default login (seeded)
+<br/>
 
+<a name="environment-variables"></a>
+
+## 🔐 Environment Variables
+
+**Frontend** — `.env.local`
+
+```env
+NEXT_PUBLIC_API_URL=https://zoom-clone-0e5k.onrender.com
+NEXT_PUBLIC_WS_URL=wss://zoom-clone-0e5k.onrender.com
 ```
-Email:    alex@zoomclone.dev
-Password: ZoomDemo2026!
-```
 
-The login form is pre-filled — just click **Sign In**. You can also create a
-new account from the Sign Up page.
+**Backend** — `.env`
 
----
-
-## Testing a Real Meeting
-
-1. Sign in and click **New Meeting** → **Start Meeting**.
-2. Copy the invite link.
-3. Open it in a **second browser / incognito window / another device on the
-   same network**, enter a name, and join.
-4. You'll see each other's video, can chat, share screen, and (as host) mute
-   all or remove the other participant.
-
-> WebRTC uses a full-mesh topology with public STUN servers, ideal for small
-> meetings. For participants on different networks behind strict NATs, a TURN
-> server would be added (see ARCHITECTURE.md → Scaling notes).
-
----
-
-## Environment Variables
-
-**backend/.env** (optional — sensible defaults provided)
-
-```
-SECRET_KEY=...            # JWT signing key
+```env
 DATABASE_URL=sqlite:///./zoom_clone.db
+SECRET_KEY=your-secret-key
 FRONTEND_URL=https://zoom-clone-teal-five.vercel.app
 CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://zoom-clone-teal-five.vercel.app
+CORS_ORIGIN_REGEX=https://.*\.vercel\.app
 ```
 
-**frontend/.env.local**
+> ⚠️ Never commit real `.env` files. Add `.env` and `.env.local` to `.gitignore` — the values above are placeholders only.
 
-```
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_WS_URL=ws://localhost:8000
-```
+<br/>
 
----
+<a name="security"></a>
 
-## Deployment
+## 🔒 Security
 
-- **Backend** → Render / Railway (run `uvicorn app.main:app --host 0.0.0.0 --port $PORT`).
-  Set `FRONTEND_URL` to the deployed frontend URL and keep `CORS_ORIGINS` in sync
-  with the deployed frontend origin(s). For persistent chat/meetings across restarts,
-  mount a disk for the SQLite file (or point `DATABASE_URL` at Postgres).
-- **Frontend** → Vercel. Set `NEXT_PUBLIC_API_URL` / `NEXT_PUBLIC_WS_URL` to the
-  deployed backend (use `wss://` for the WebSocket URL over HTTPS).
+- **JWT-based authentication** — stateless, short-lived access tokens
+- **BCrypt password hashing** — passwords are never stored in plaintext
+- **Protected API routes** — sensitive endpoints require a valid token
+- **CORS protection** — only the deployed frontend origin(s) are allowed to call the API
+- **Environment-based secrets** — keys and connection strings are never hardcoded
 
----
+<br/>
 
-## Assumptions
+<a name="roadmap"></a>
 
-- **Default user**: per the brief, a default seeded user (`alex@zoomclone.dev`)
-  is available and auto-filled. Full auth is implemented as a bonus, but you're
-  never forced through it to demo core features.
-- **Meeting IDs** are unique 11-digit codes displayed Zoom-style (`812 3456 7890`).
-  Both spaced and unspaced forms are accepted when joining.
-- **Signaling state** (who is currently in a room) lives in memory since it's
-  ephemeral; meetings, users, and chat history are persisted in SQLite.
-- **Mesh WebRTC** is used (no media server), which is appropriate for the
-  small-meeting scope of this assignment.
-- A meeting is marked `ended` when the host clicks **End**; ended meetings can't
-  be joined and appear under Recent.
+## 🧭 Roadmap
 
----
+- [ ] Meeting recording
+- [ ] Waiting room / host approval
+- [ ] AI-generated meeting summaries
+- [ ] Calendar integration (Google Calendar sync)
 
-## Database Schema (summary)
+<br/>
 
-- **users** — accounts (name, email, hashed_password, avatar_color).
-- **meetings** — instant/scheduled meetings; FK `host_id → users`.
-- **participants** — join records; FK `meeting_id → meetings`, `user_id → users`.
-- **chat_messages** — in-meeting messages; FK `meeting_id → meetings`.
+<a name="contributing"></a>
 
-Full ER diagram and relationships in **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m "Add your feature"`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
+
+<br/>
+
+<a name="author"></a>
+
+## 👨‍💻 Author
+
+**Piyush Sharma**
+
+[![GitHub](https://img.shields.io/badge/GitHub-PiyushSharma680-181717?style=flat&logo=github&logoColor=white)](https://github.com/PiyushSharma680)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Piyush%20Sharma-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/piyush-sharma-8a773a389)
+
+<br/>
+
+<a name="license"></a>
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+
+<br/>
+
+<div align="center">
+
+⭐ **If you found this project interesting, consider giving it a star!**
+
+Built with ❤️ using Next.js, FastAPI & WebRTC.
+
+</div>
