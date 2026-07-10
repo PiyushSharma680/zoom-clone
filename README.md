@@ -12,35 +12,38 @@ closely on Zoom's web client.
 
 ## Tech Stack
 
-| Layer      | Technology                                                        |
-| ---------- | ----------------------------------------------------------------- |
-| Frontend   | Next.js 14 (App Router, TypeScript), Tailwind CSS, lucide-react   |
-| Real-time  | Native WebRTC (mesh) + WebSocket signaling                        |
-| Backend    | Python, FastAPI, WebSockets, SQLAlchemy 2.0                       |
-| Database   | SQLite                                                             |
-| Auth       | JWT (python-jose) + bcrypt (passlib)                              |
+| Layer     | Technology                                                      |
+| --------- | --------------------------------------------------------------- |
+| Frontend  | Next.js 14 (App Router, TypeScript), Tailwind CSS, lucide-react |
+| Real-time | Native WebRTC (mesh) + WebSocket signaling                      |
+| Backend   | Python, FastAPI, WebSockets, SQLAlchemy 2.0                     |
+| Database  | SQLite                                                          |
+| Auth      | JWT (python-jose) + bcrypt (passlib)                            |
 
 ---
 
 ## Features
 
 **Core**
+
 - **Landing dashboard** — Zoom-style home with navbar, profile/settings menu,
   New / Join / Schedule / Share tiles, live clock & greeting, **Upcoming** and
   **Recent** meeting sections.
 - **Instant meeting** — one click creates a meeting with a unique 11-digit
   Meeting ID + shareable invite link, then drops you into the room.
-- **Join meeting** — by Meeting ID *or* pasted invite link, with server-side
+- **Join meeting** — by Meeting ID _or_ pasted invite link, with server-side
   validation and a display-name / device-check lobby.
 - **Schedule meeting** — title, description, date & time, duration; auto-generated
   link; stored in the DB and surfaced under Upcoming.
 
 **Bonus (all implemented)**
+
 - **Responsive design** — mobile, tablet, desktop.
 - **Authentication** — login / signup with JWT; a default seeded account.
 - **Host controls** — mute all, remove participant.
 
 **Meeting room extras**
+
 - Real camera/mic via `getUserMedia`, mesh WebRTC peer connections.
 - Gallery grid that adapts to participant count, mirrored self-view.
 - Screen sharing, mic/cam toggles with live broadcast of state.
@@ -86,6 +89,7 @@ and workflow diagrams.
 ## Getting Started
 
 ### Prerequisites
+
 - Python 3.10+
 - Node.js 18+
 - A modern browser (Chrome/Edge/Firefox) — camera/mic permission needed.
@@ -116,10 +120,12 @@ npm run dev
 App runs at `http://localhost:3000`.
 
 ### Default login (seeded)
+
 ```
 Email:    alex@zoomclone.dev
 Password: ZoomDemo2026!
 ```
+
 The login form is pre-filled — just click **Sign In**. You can also create a
 new account from the Sign Up page.
 
@@ -143,13 +149,16 @@ new account from the Sign Up page.
 ## Environment Variables
 
 **backend/.env** (optional — sensible defaults provided)
+
 ```
 SECRET_KEY=...            # JWT signing key
 DATABASE_URL=sqlite:///./zoom_clone.db
-CORS_ORIGINS=http://localhost:3000
+FRONTEND_URL=https://zoom-clone-teal-five.vercel.app
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://zoom-clone-teal-five.vercel.app
 ```
 
 **frontend/.env.local**
+
 ```
 NEXT_PUBLIC_API_URL=http://localhost:8000
 NEXT_PUBLIC_WS_URL=ws://localhost:8000
@@ -160,8 +169,9 @@ NEXT_PUBLIC_WS_URL=ws://localhost:8000
 ## Deployment
 
 - **Backend** → Render / Railway (run `uvicorn app.main:app --host 0.0.0.0 --port $PORT`).
-  Set `CORS_ORIGINS` to the deployed frontend URL. For persistent chat/meetings
-  across restarts, mount a disk for the SQLite file (or point `DATABASE_URL` at Postgres).
+  Set `FRONTEND_URL` to the deployed frontend URL and keep `CORS_ORIGINS` in sync
+  with the deployed frontend origin(s). For persistent chat/meetings across restarts,
+  mount a disk for the SQLite file (or point `DATABASE_URL` at Postgres).
 - **Frontend** → Vercel. Set `NEXT_PUBLIC_API_URL` / `NEXT_PUBLIC_WS_URL` to the
   deployed backend (use `wss://` for the WebSocket URL over HTTPS).
 

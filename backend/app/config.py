@@ -2,6 +2,14 @@
 from pydantic_settings import BaseSettings
 
 
+DEFAULT_FRONTEND_URL = "https://zoom-clone-teal-five.vercel.app"
+DEFAULT_CORS_ORIGINS = (
+    "http://localhost:3000,"
+    "http://127.0.0.1:3000,"
+    f"{DEFAULT_FRONTEND_URL}"
+)
+
+
 class Settings(BaseSettings):
     # Auth
     secret_key: str = "change-me-in-production-super-secret-key-2026"
@@ -11,15 +19,26 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "sqlite:///./zoom_clone.db"
 
-    # CORS — comma-separated list of allowed frontend origins
-    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000,https://zoom-clone-teal-five.vercel.app"
+    # Frontend base URL used when generating shareable invite links.
+    frontend_url: str = DEFAULT_FRONTEND_URL
+
+    # CORS — comma-separated list of allowed frontend origins.
+    # Any deployment override is merged with the known defaults so a partial
+    # Render env config cannot accidentally drop the production frontend.
+    cors_origins: str = DEFAULT_CORS_ORIGINS
 
     class Config:
         env_file = ".env"
 
     @property
     def cors_origins_list(self) -> list[str]:
-        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+        origins = [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+        frontend = self.frontend_url.strip().rstrip("/")
+        if frontend and frontend not in origins:
+            origins.append(frontend)
+
+        return origins
 
 
 settings = Settings()

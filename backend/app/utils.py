@@ -18,7 +18,7 @@ def generate_meeting_code(db: Session) -> str:
 
 def invite_link(meeting_code: str) -> str:
     """Build a shareable invite link for a meeting code."""
-    frontend = settings.cors_origins_list[0] if settings.cors_origins_list else "http://localhost:3000"
+    frontend = settings.frontend_url.strip().rstrip("/") or "http://localhost:3000"
     slug = meeting_code.replace(" ", "")
     return f"{frontend}/meeting/{slug}"
 
