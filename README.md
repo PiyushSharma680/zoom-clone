@@ -23,11 +23,7 @@ Real-time video calls, live signaling, and meeting management — built with **N
 
 <br/>
 
-<div align="center">
-
-<img src="./screenshots/hero.png" alt="Zoom Clone Hero"/>
-
-</div>
+![Zoom Clone Hero](screenshots/hero.png)
 
 <br/>
 
@@ -160,109 +156,73 @@ The following screenshots showcase the complete workflow of the application—fr
 
 ## 🏠 Application Overview
 
-<p align="center">
-<img src="./screenshots/hero.png" alt="Zoom Clone Hero"/>
-</p>
+![Zoom Clone Hero](screenshots/hero.png)
 
-<p align="center">
 A modern, responsive dashboard providing instant access to meeting creation, scheduling, recent meetings, and productivity features.
-</p>
 
 ---
 
 ## 🔐 Login Page
 
-<p align="center">
-<img src="./screenshots/login.png" alt="Login Page" width="900"/>
-</p>
+![Login Page](screenshots/login.png)
 
-<p align="center">
 Secure authentication using JWT-based login. Users can quickly access their personalized dashboard after successful authentication.
-</p>
 
 ---
 
 ## 📝 Sign Up Page
 
-<p align="center">
-<img src="./screenshots/signup.png" alt="Signup Page" width="900"/>
-</p>
+![Signup Page](screenshots/signup.png)
 
-<p align="center">
 Create a new account securely. Passwords are hashed before storage, ensuring user credentials remain protected.
-</p>
 
 ---
 
 ## 📊 Dashboard
 
-<p align="center">
-<img src="./screenshots/dashboard.png" alt="Dashboard" width="900"/>
-</p>
+![Dashboard](screenshots/dashboard.png)
 
-<p align="center">
 The central dashboard provides quick access to instant meetings, scheduled meetings, meeting history, and meeting management tools through a clean and responsive interface.
-</p>
 
 ---
 
 ## 🎥 Create Instant Meeting
 
-<p align="center">
-<img src="./screenshots/create-meeting.png" alt="Create Meeting" width="900"/>
-</p>
+![Create Meeting](screenshots/create-meeting.png)
 
-<p align="center">
 Launch an instant video conference with a single click. Every meeting is assigned a unique meeting ID and invitation link for secure participant access.
-</p>
 
 ---
 
 ## 📅 Schedule a Meeting
 
-<p align="center">
-<img src="./screenshots/schedule-meeting.png" alt="Schedule Meeting" width="900"/>
-</p>
+![Schedule Meeting](screenshots/schedule-meeting.png)
 
-<p align="center">
 Plan meetings in advance by specifying the title, description, date, and time. Scheduled meetings are automatically organized for future access.
-</p>
 
 ---
 
 ## 📆 Scheduled Meetings
 
-<p align="center">
-<img src="./screenshots/scheduled-meetings.png" alt="Scheduled Meetings" width="900"/>
-</p>
+![Scheduled Meetings](screenshots/scheduled-meetings.png)
 
-<p align="center">
 View all upcoming scheduled meetings directly from the dashboard, making it easy to manage and join future sessions.
-</p>
 
 ---
 
 ## 🎬 Live Meeting Room
 
-<p align="center">
-<img src="./screenshots/meeting-room.png" alt="Meeting Room" width="900"/>
-</p>
+![Meeting Room](screenshots/meeting-room.png)
 
-<p align="center">
 Real-time meeting interface powered by WebRTC and WebSockets, supporting secure peer-to-peer video communication with live signaling.
-</p>
 
 ---
 
 ## 📚 Meeting History
 
-<p align="center">
-<img src="./screenshots/meeting-history.png" alt="Meeting History" width="900"/>
-</p>
+![Meeting History](screenshots/meeting-history.png)
 
-<p align="center">
 Access previously hosted meetings with complete meeting records, enabling users to review and manage past conferencing sessions.
-</p>
 
 ---
 
